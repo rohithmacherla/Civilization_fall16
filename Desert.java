@@ -4,9 +4,9 @@ public class Desert {
     private Scanner scan = new Scanner(System.in);
 
     public int findTreasure() {
-        // YOUR CODE HERE
-        // A valid treasure trove must be greater than 0
-        return -1;
+        int value;
+        value = (int) (Math.random() * 500);
+        return value;
     }
 
     public boolean lost() {

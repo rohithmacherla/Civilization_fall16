@@ -1,12 +1,17 @@
-import java.util.Scanner;
+package model;
 
-public class Desert {
+import java.util.Scanner;
+import java.util.Random;
+
+class Desert {
     private Scanner scan = new Scanner(System.in);
+    private Random rand = new Random();
 
     public int findTreasure() {
-        int value;
-        value = (int) (Math.random() * 500);
-        return value;
+        if (rand.nextInt(10) < 1 && lost()) {
+            findTreasure();
+        }
+        return rand.nextInt(50) + 1;
     }
 
     public boolean lost() {

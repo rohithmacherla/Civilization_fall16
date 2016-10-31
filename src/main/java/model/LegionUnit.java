@@ -1,10 +1,21 @@
 package model;
 
+/**
+ * Represents a Legion unit.
+ *
+ * @author Jim Harris
+ * @version 1.0
+ */
 class LegionUnit extends MeleeUnit {
 
-    public LegionUnit(Civilization civilization) {
-        super(civilization);
-        this.setDamage((int) (30 * 1.5));
+    /**
+     * Public constructor
+     *
+     * @param owner The owner of this unit.
+     */
+    public LegionUnit(Civilization owner) {
+        super(owner);
+        this.setDamage((int) (this.getDamage() * 1.5));
     }
 
     @Override
@@ -22,6 +33,6 @@ class LegionUnit extends MeleeUnit {
 
     @Override
     public String toString() {
-        return "Legion Unit. " + super.toString();
+        return "Legion. " + super.toString();
     }
 }

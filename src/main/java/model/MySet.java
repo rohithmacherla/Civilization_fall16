@@ -1,58 +1,86 @@
 package model;
 
-class MySet<E> implements SimpleSet<E> {
-    private E[] data;
-    private int size;
+import java.util.Random;
+import java.util.Iterator;
 
-    MySet() {
-        Object[] k = new Object[10];
-        data = (E[]) k;
-        size = 0;
+/**
+ * Represents a custom Set data structure.
+ *
+ * @author Ryan Voor
+ * @version 1.0
+ */
+class MySet<E> implements SimpleSet<E>, Iterable<E> {
+
+    private E[] data;
+    private int numElements;
+    private final int startingSize = 5;
+
+    @Override
+    public Iterator<E> iterator() {
+        return new MySetIterator();
     }
 
+    private class MySetIterator implements Iterator<E> {
+        private int index = 0;
+
+        public int getIndex() {
+            return index;
+        }
+
+        public void setIndex(int k) {
+            index = k;
+        }
+
+        public boolean hasNext() {
+            if (numElements < numElements) {
+                return true;
+            }
+            return false;
+        }
+
+        public E next() {
+            if (hasNext()) {
+                index++;
+                return data[index - 1];
+            }
+            return null;
+        //throw new ElementDoesNotExistException("Element does not exist");
+        }
+
+        public void remove() {
+            data[index] = null;
+            for (int j = index; j < numElements - 1; j++) {
+                data[j] = data[j + 1];
+            }
+            numElements--;
+            index--;
+        }
+    }
+
+    /**
+     * Public constructor.
+     */
+    @SuppressWarnings("unchecked")
+    public MySet() {
+        this.data = (E[]) new Object[startingSize];
+        this.numElements = 0;
+    }
+
+    @Override
     public boolean add(E e) {
-        if (size == data.length) {
-            Object[] tempO = new Object[size + 1];
-            E[] tempE = (E[]) tempO;
-            for (int i = 0; i < size; i++) {
-                tempE[i] = data[i];
-            }
-            data = tempE;
+        if (this.contains(e)) {
+            return false;
         }
-        for (int i = 0; i < size; i++) {
-            if (data[i].equals(e)) {
-                return false;
-            }
+        if (numElements >= data.length) {
+            this.doubleBackingArray();
         }
-        data[size] = e;
-        size++;
+        data[numElements++] = e;
         return true;
     }
 
-    public E remove(E e) throws ElementDoesNotExistException {
-        if (size == 0) {
-            throw new ElementDoesNotExistException("You cannot "
-                + "remove an non-existing element!");
-        }
-        E temp = null;
-        for (int i = 0; i < size; i++) {
-            if (data[i].equals(e)) {
-                temp = data[i];
-                data[i] = data[size - 1];
-                data[size - 1] = temp;
-                size--;
-                break;
-            }
-            if (temp == null) {
-                throw new ElementDoesNotExistException("You cannot"
-                + " remove an non-existing element!");
-            }
-        }
-        return temp;
-    }
-
+    @Override
     public boolean contains(E e) {
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < numElements; i++) {
             if (data[i].equals(e)) {
                 return true;
             }
@@ -60,40 +88,105 @@ class MySet<E> implements SimpleSet<E> {
         return false;
     }
 
-    public E[] removeAll(E[] e) throws ElementDoesNotExistException {
-        if (size == 0) {
-            throw new ElementDoesNotExistException("You cannot remove elements"
-                + " because none exist!");
+    @Override
+    public E remove(E e) throws ElementDoesNotExistException {
+        for (int i = 0; i < numElements; i++) {
+            if (data[i].equals(e)) {
+                E toBeReturned = data[i];
+                data[i] = null;
+                for (int j = i; j < numElements - 1; j++) {
+                    data[j] = data[j + 1];
+                }
+                numElements--;
+                return toBeReturned;
+            }
         }
-        return data;
+        throw new ElementDoesNotExistException(
+            "Cannot remove an element that isn't in the set!", e);
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public E[] removeAll(E[] elements) throws ElementDoesNotExistException {
+        for (E element: elements) {
+            if (!this.contains(element)) {
+                throw new ElementDoesNotExistException("Attempted to remove "
+                    + element + " from set but it wasn't in the set!");
+            }
+        }
+        E[] results = (E[]) new Object[elements.length];
+        int counter = 0;
+        for (E element: elements) {
+            // this guard is in case there are duplicate elements in the
+            // parameter array
+            if (this.contains(element)) {
+                results[counter++] = this.remove(element);
+            }
+        }
+        return results;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public void clear() {
-        size = 0;
+        this.data = (E[]) new Object[startingSize];
+        this.numElements = 0;
     }
 
+    @Override
     public int size() {
-        return size;
+        return numElements;
     }
 
+    @Override
     public boolean isEmpty() {
-        return size == 0;
+        return numElements == 0;
     }
+
+    @Override
     public E getRandomElement() throws ElementDoesNotExistException {
-        int temp = (int) (Math.random() * size);
-        return data[temp];
-    }
-
-    public E[] toArray() {
-        return data;
-    }
-
-    public String toString() {
-        String output = "This set contains: ";
-        for (int i = 0; i < size; i++) {
-            output += data[i] + " ";
+        if (this.isEmpty()) {
+            throw new ElementDoesNotExistException(
+                "Cannot get an element from a empty set!");
         }
-        return output;
+        Random rand = new Random();
+        return data[rand.nextInt(numElements)];
+    }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public E[] toArray() {
+        E[] result = (E[]) new Object[numElements];
+        for (int i = 0; i < numElements; i++) {
+            result[i] = data[i];
+        }
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        String result = "[";
+        for (int i = 0; i < numElements; i++) {
+            if (i == numElements - 1) {
+                result += "" + data[i];
+            } else {
+                result += "" + data[i] + ", ";
+            }
+        }
+        result += "]";
+        return result;
+    }
+
+    /**
+     * Doubles the size of the backing array while maintaining all of the
+     * elements in the SimpleSet.
+     */
+    @SuppressWarnings("unchecked")
+    private void doubleBackingArray() {
+        E[] newArray = (E[]) new Object[data.length * 2];
+        for (int i = 0; i < numElements; i++) {
+            newArray[i] = data[i];
+        }
+        data = newArray;
     }
 }

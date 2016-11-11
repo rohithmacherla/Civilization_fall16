@@ -1,5 +1,7 @@
 package model;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 /**
  * A wrapper class for all of the Objects needed in the game. Also has methods
  * to facilitate interactions between these objects, and methods to interface
@@ -11,6 +13,7 @@ package model;
 public class Model {
 
     private static Civilization playerCivilization;
+    private static ArrayList<Civilization> civs = new ArrayList<>();
     private static Map map;
     private static boolean playing;
     private static TerrainTile selected;
@@ -59,18 +62,62 @@ public class Model {
      * instantiated.
      */
     public static boolean chooseCivilization(int civChoice) {
+        boolean success = false;
         switch (civChoice) {
         case 1:
             playerCivilization = new Egypt();
-            return true;
+            civs.add(new QinDynasty());
+            civs.add(new RomanEmpire());
+            success = true;
+            break;
         case 2:
             playerCivilization = new QinDynasty();
-            return true;
+            civs.add(new Egypt());
+            civs.add(new RomanEmpire());
+            success = true;
+            break;
         case 3:
             playerCivilization = new RomanEmpire();
-            return true;
+            civs.add(new QinDynasty());
+            civs.add(new Egypt());
+            success = true;
+            break;
         default:
-            return false;
+            success = false;
+        }
+        if (success) {
+            simulateEnemies();
+            civs.add(playerCivilization);
+        }
+        return success;
+    }
+
+    private static void simulateEnemies() {
+        //Add more civilizations for show
+        civs.add(new Civilization("America"));
+        civs.add(new Civilization("Aztec"));
+        civs.add(new Civilization("China"));
+        civs.add(new Civilization("India"));
+        civs.add(new Civilization("Japan"));
+        java.util.Random rand = new java.util.Random();
+        for (Civilization c : civs) {
+            c.increaseHappiness(rand.nextInt(500) + 1);
+            c.produceResources(rand.nextInt(500) + 1);
+            int count = rand.nextInt(10) + 1;
+            int i = 0;
+            while (i++ < count) {
+                c.getStrategy().battle();
+            }
+            count = rand.nextInt(10) + 1;
+            i = 0;
+            while (i++ < count) {
+                c.getTechnology().philosophize();
+            }
+            count = rand.nextInt(5) + 1;
+            i = 0;
+            while (i++ < count) {
+                c.incrementNumSettlements();
+            }
         }
     }
 
@@ -81,6 +128,113 @@ public class Model {
      */
     public static String explore() {
         return playerCivilization.explore();
+    }
+
+    public static void standings(int choice) {
+        //int i = 1;
+        switch (choice) {
+        case 1:
+            //Military Prowess
+            System.out.println("People with the Pointiest Sticks:");
+            Collections.sort(civs, new Comparator<Civilization>() {
+                public int compare(Civilization c2, Civilization c1) {
+                    //stategy level in strategy
+                    return c1.getStrategy().getStrategyLevel()
+                        - c2.getStrategy().getStrategyLevel();
+                }
+            });
+            for (int i = 0; i < civs.size(); i++) {
+                System.out.println((i + 1) + ". " + civs.get(i) + ": "
+                    + civs.get(i).getStrategy().getStrategyLevel());
+            }
+            break;
+
+
+
+        case 2:
+            //Citizen Happiness, in this class
+            System.out.println("People with the most faithful Citizens:");
+
+            Collections.sort(civs, new Comparator<Civilization>() {
+                public int compare(Civilization c2, Civilization c1) {
+                    //stategy level in strategy
+                    return c1.getHappiness()
+                        - c2.getHappiness();
+                }
+            });
+
+            for (int i = 0; i < civs.size(); i++) {
+                System.out.println((i + 1) + ". " + civs.get(i) + ": "
+                    + civs.get(i).getHappiness());
+            }
+            break;
+
+
+
+
+        case 3:
+            //Tech Points, in technology
+            System.out.println("People with the best Science:");
+
+            Collections.sort(civs, new Comparator<Civilization>() {
+                public int compare(Civilization c2, Civilization c1) {
+                    //stategy level in strategy
+                    return c1.getTechnology().getTechPoints()
+                        - c2.getTechnology().getTechPoints();
+                }
+            });
+
+            for (int i = 0; i < civs.size(); i++) {
+                System.out.println((i + 1) + ". " + civs.get(i) + ": "
+                    + civs.get(i).getTechnology().getTechPoints());
+            }
+            break;
+        case 4:
+
+            System.out.println("People with the finest Resources:");
+
+            Collections.sort(civs, new Comparator<Civilization>() {
+                public int compare(Civilization c2, Civilization c1) {
+                    //stategy level in strategy
+                    return c1.getResources()
+                        - c2.getResources();
+                }
+            });
+
+            for (int i = 0; i < civs.size(); i++) {
+                System.out.println((i + 1) + ". " + civs.get(i) + ": "
+                    + civs.get(i).getResources());
+            }
+            break;
+
+
+        case 5:
+            //Overall Prowess, in civlization
+            System.out.println("People with the Fanciest Crowns");
+
+            Collections.sort(civs, new Comparator<Civilization>() {
+                public int compare(Civilization c2, Civilization c1) {
+                    //stategy level in strategy
+                    if (c1.getNumSettlements() - c2.getNumSettlements() == 0) {
+                        return c1.getStrategy().getStrategyLevel()
+                            - c2.getStrategy().getStrategyLevel();
+                    }
+                    return c1.getNumSettlements() - c2.getNumSettlements();
+                }
+            });
+
+            for (int i = 0; i < civs.size(); i++) {
+                System.out.println((i + 1) + ". " + civs.get(i)
+                    + ": Settlements - " + civs.get(i).getNumSettlements()
+                    + " Military level - "
+                    + civs.get(i).getStrategy().getStrategyLevel());
+            }
+            break;
+
+
+        default:
+            break;
+        }
     }
 
     /**
@@ -272,6 +426,7 @@ public class Model {
      * @return the toString of the selected tile.
      */
     public static String selectedString() {
+
         return selected.toString();
     }
 

@@ -1,7 +1,6 @@
 package model;
 
 import java.util.Random;
-import java.util.Iterator;
 
 /**
  * Represents a custom Set data structure.
@@ -9,53 +8,11 @@ import java.util.Iterator;
  * @author Ryan Voor
  * @version 1.0
  */
-class MySet<E> implements SimpleSet<E>, Iterable<E> {
+class MySet<E> implements SimpleSet<E> {
 
     private E[] data;
     private int numElements;
     private final int startingSize = 5;
-
-    @Override
-    public Iterator<E> iterator() {
-        return new MySetIterator();
-    }
-
-    private class MySetIterator implements Iterator<E> {
-        private int index = 0;
-
-        public int getIndex() {
-            return index;
-        }
-
-        public void setIndex(int k) {
-            index = k;
-        }
-
-        public boolean hasNext() {
-            if (numElements < numElements) {
-                return true;
-            }
-            return false;
-        }
-
-        public E next() {
-            if (hasNext()) {
-                index++;
-                return data[index - 1];
-            }
-            return null;
-        //throw new ElementDoesNotExistException("Element does not exist");
-        }
-
-        public void remove() {
-            data[index] = null;
-            for (int j = index; j < numElements - 1; j++) {
-                data[j] = data[j + 1];
-            }
-            numElements--;
-            index--;
-        }
-    }
 
     /**
      * Public constructor.
@@ -94,7 +51,7 @@ class MySet<E> implements SimpleSet<E>, Iterable<E> {
             if (data[i].equals(e)) {
                 E toBeReturned = data[i];
                 data[i] = null;
-                for (int j = i; j < numElements - 1; j++) {
+                for (int j = i; j < numElements; j++) {
                     data[j] = data[j + 1];
                 }
                 numElements--;
@@ -117,11 +74,9 @@ class MySet<E> implements SimpleSet<E>, Iterable<E> {
         E[] results = (E[]) new Object[elements.length];
         int counter = 0;
         for (E element: elements) {
-            // this guard is in case there are duplicate elements in the
-            // parameter array
-            if (this.contains(element)) {
-                results[counter++] = this.remove(element);
-            }
+            // hypothetically a ElementDoesNotExistException should never
+            // get thrown from this call since we checked above
+            results[counter++] = this.remove(element);
         }
         return results;
     }

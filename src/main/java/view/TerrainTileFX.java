@@ -7,6 +7,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import model.TerrainTile;
+import javafx.scene.image.Image;
 
 /**
  * Created by RuYiMarone on 11/11/2016.
@@ -52,13 +53,13 @@ public class TerrainTileFX extends StackPane {
      */
     public void updateTileView() {
         if (tile.isEmpty()) {
-            overlay == null;
+            overlay = null;
         } else {
-            overlay.setFill(tile.getOccupant());
-            this.getChildren().add(new ImageView(icon));
+            overlay.setFill(tile.getOccupant().getColor());
+            this.getChildren().add(icon);
         }
         if (this.equals(GameController.getLastClicked())) {
-            overlay.setFill(Color.rbg(1, 2, 4, 5));
+            overlay.setFill(Color.rgb(1, 2, 4, 5));
         }
     }
 }

@@ -5,6 +5,7 @@ package view;
 // import model.Settlement;
 // import javafx.event.EventHandler;
 // import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
 /**
  * This class should represents the bulding menu
  */
